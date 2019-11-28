@@ -51,7 +51,7 @@ def create_workers(worker_count):
 		if _startsWith:
 			x = Process(target=startswith, args=(counter,), daemon=True)
 		else:
-			x = Process(target=anywhere, daemon=True)
+			x = Process(target=anywhere, args=(counter,), daemon=True)
 		x.start()
 
 
