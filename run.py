@@ -55,16 +55,17 @@ def create_workers(worker_count, counter):
 
 def sanity_check(target):
     lexicon = ascii_uppercase + ascii_lowercase + digits + '+/'
+    if len(target) > 43:
+        raise Exception("Target string is longer than 43 chars.")
     if target != "":
         for char in target:
             if char in lexicon:
                 continue
             else:
                 raise Exception("Target string must constitute of b64 alphabet.")
-    elif len(target) > 43:
-        raise Exception("Target string is longer than 43 chars.")
     else:
         raise Exception("Target string is empty.")
+    
 
 
 def main():
