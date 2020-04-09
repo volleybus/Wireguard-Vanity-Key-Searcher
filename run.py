@@ -1,7 +1,10 @@
-from nacl.public import PrivateKey
+#!/usr/bin/env python
+import functools
 from base64 import b64encode
 from multiprocessing import Process, cpu_count, Value
 from string import ascii_uppercase, ascii_lowercase, digits
+
+from nacl.public import PrivateKey
 
 ### Vars.
 # parallel worker count. setting it to a value higher than cpu_count - 1 will cause system to be very unresponsive.
@@ -29,36 +32,21 @@ def keygen():
     )
 
 
-def anywhere(ctr):
-    targetstring = targetString.lower()
+def generate_keys(counter, matchfunc):
     while True:
         private, public = keygen()
-        if targetstring in public.lower():
-            with ctr.get_lock():
-                ctr.value += 1
+        if matchfunc(public.lower()):
+            with counter.get_lock():
+                counter.value += 1
                 print(
-                    f"[{ctr.value}]\tPrivate: {private}\t|\tPublic: {public}"
+                    f"[{counter.value}]\tPrivate: {private}\t|\tPublic: {public}"
                 )
 
 
-def startswith(ctr):
-    targetstring = targetString.lower()
-    while True:
-        private, public = keygen()
-        if public.lower().startswith(targetstring):
-            with ctr.get_lock():
-                ctr.value += 1
-                print(
-                    f"[{ctr.value}]\tPrivate: {private}\t|\tPublic: {public}"
-                )
-
-
-def create_workers(worker_count, counter):
+def create_workers(worker_count, counter, matchfunc):
+    targetfunc = functools.partial(generate_keys, matchfunc=matchfunc)
     for index in range(worker_count):
-        if _startsWith:
-            x = Process(target=startswith, args=(counter,), daemon=True)
-        else:
-            x = Process(target=anywhere, args=(counter,), daemon=True)
+        x = Process(target=targetfunc, args=(counter,), daemon=True)
         x.start()
 
 
@@ -82,7 +70,16 @@ def main():
     sanity_check(targetString)
     counter = Value("h", 0)
     wc = workerCount if workerCount else cpu_count() - 1
-    create_workers(wc, counter)
+
+    targetstring = targetString.lower()
+    if _startsWith:
+        def matchfunc(str_):
+            return str_.lower().startswith(targetstring)
+    else:
+        def matchfunc(str_):
+            return targetstring in str_.lower()
+
+    create_workers(wc, counter, matchfunc)
     print(
         f"\n{wc} thread(s) started in search for {targetString},"
         f" {'in the beginning of keys' if _startsWith else 'in the keys'}.\n"
