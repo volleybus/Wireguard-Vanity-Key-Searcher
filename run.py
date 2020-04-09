@@ -23,7 +23,10 @@ targetAmount = 5
 
 def keygen():
     private = PrivateKey.generate()
-    return b64encode(bytes(private)).decode("ascii"), b64encode(bytes(private.public_key)).decode("ascii")
+    return (
+        b64encode(bytes(private)).decode("ascii"),
+        b64encode(bytes(private.public_key)).decode("ascii"),
+    )
 
 
 def anywhere(ctr):
@@ -33,7 +36,9 @@ def anywhere(ctr):
         if targetstring in public.lower():
             with ctr.get_lock():
                 ctr.value += 1
-                print(f"[{ctr.value}]\tPrivate: {private}\t|\tPublic: {public}")
+                print(
+                    f"[{ctr.value}]\tPrivate: {private}\t|\tPublic: {public}"
+                )
 
 
 def startswith(ctr):
@@ -43,7 +48,9 @@ def startswith(ctr):
         if public.lower().startswith(targetstring):
             with ctr.get_lock():
                 ctr.value += 1
-                print(f"[{ctr.value}]\tPrivate: {private}\t|\tPublic: {public}")
+                print(
+                    f"[{ctr.value}]\tPrivate: {private}\t|\tPublic: {public}"
+                )
 
 
 def create_workers(worker_count, counter):
@@ -56,7 +63,7 @@ def create_workers(worker_count, counter):
 
 
 def sanity_check(target):
-    lexicon = ascii_uppercase + ascii_lowercase + digits + '+/'
+    lexicon = ascii_uppercase + ascii_lowercase + digits + "+/"
     if len(target) > 43:
         raise Exception("Target string is longer than 43 chars.")
     if target != "":
@@ -64,10 +71,11 @@ def sanity_check(target):
             if char in lexicon:
                 continue
             else:
-                raise Exception("Target string must constitute of b64 alphabet.")
+                raise Exception(
+                    "Target string must constitute of b64 alphabet."
+                )
     else:
         raise Exception("Target string is empty.")
-
 
 
 def main():
@@ -75,8 +83,10 @@ def main():
     counter = Value("h", 0)
     wc = workerCount if workerCount else cpu_count() - 1
     create_workers(wc, counter)
-    print(f"\n{wc} thread(s) started in search for {targetString},"
-          f" {'in the beginning of keys' if _startsWith else 'in the keys'}.\n")
+    print(
+        f"\n{wc} thread(s) started in search for {targetString},"
+        f" {'in the beginning of keys' if _startsWith else 'in the keys'}.\n"
+    )
 
     while counter.value < targetAmount:
         pass
