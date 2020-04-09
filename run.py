@@ -27,18 +27,20 @@ def keygen():
 
 
 def anywhere(ctr):
+    targetstring = targetString.lower()
     while True:
         private, public = keygen()
-        if targetString.lower() in public.lower():
+        if targetstring in public.lower():
             with ctr.get_lock():
                 ctr.value += 1
                 print(f"[{ctr.value}]\tPrivate: {private}\t|\tPublic: {public}")
 
 
 def startswith(ctr):
+    targetstring = targetString.lower()
     while True:
         private, public = keygen()
-        if public.lower().startswith(targetString.lower()):
+        if public.lower().startswith(targetstring):
             with ctr.get_lock():
                 ctr.value += 1
                 print(f"[{ctr.value}]\tPrivate: {private}\t|\tPublic: {public}")
@@ -65,7 +67,7 @@ def sanity_check(target):
                 raise Exception("Target string must constitute of b64 alphabet.")
     else:
         raise Exception("Target string is empty.")
-    
+
 
 
 def main():
